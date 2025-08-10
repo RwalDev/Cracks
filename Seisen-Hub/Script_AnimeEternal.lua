@@ -1616,14 +1616,13 @@ function startAutoObelisk()
     task.spawn(function()
         local obeliskTypes = {
             "Dragon_Obelisk",
-            "Slayer_Obelisk",
             "Pirate_Obelisk",
             "Soul_Obelisk",
-            "Demon_Obeslisk",
-            "Spirit_Obelisk",
-            "Knight_Obelisk",
-            "Warrior_Obelisk",
-            "Archer_Obelisk",
+            "Sorcerer_Obelisk",
+            "Slayer_Obelisk",
+            "Solo_Obelisk",
+            "Clover_Obelisk",
+            "Leaf_Obelisk",
         }
         while autoObeliskEnabled and getgenv().SeisenHubRunning do
             for _, obeliskType in ipairs(obeliskTypes) do
@@ -2762,4 +2761,3 @@ task.defer(function()
         end
     end
 end)
-
