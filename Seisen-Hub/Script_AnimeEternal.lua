@@ -431,6 +431,10 @@ local selectedObeliskType = config.SelectedObeliskType or "Slayer_Obelisk"
 local fpsBoostEnabled = config.FPSBoostToggle or false
 local autoRollDemonArtsEnabled = config.AutoRollDemonArtsToggle or false
 local selectedGachaRarities = config.AutoDeleteGachaRaritiesDropdown or {}
+local autoChakraProgressionUpgradeEnabled = config.AutoChakraProgressionUpgradeToggle or false
+local autoSoloHunterRankEnabled = config.AutoSoloHunterRankToggle or false
+local autoReawakeningProgressionUpgradeEnabled = config.AutoReawakeningProgressionUpgradeToggle or false
+local autoMonarchProgressionUpgradeEnabled = config.AutoMonarchProgressionUpgradeToggle or false
 
 -- Load config values with defaults
 isAuraEnabled = config.AutoFarmToggle or false
@@ -478,9 +482,15 @@ fpsBoostEnabled = config.FPSBoostToggle or false
 autoRollDemonArtsEnabled = config.AutoRollDemonArtsToggle or false
 autoRedeemCodesEnabled = config.AutoRedeemCodesToggle or false
 selectedGachaRarities = config.AutoDeleteGachaRaritiesDropdown or {}
+autoChakraProgressionUpgradeEnabled = config.AutoChakraProgressionUpgradeToggle or false
 
 -- Additional variables that need to be declared
 local originalVolumes = {}
+
+-- Top config variables for new features
+local autoSoloHunterRankEnabled = config.AutoSoloHunterRankToggle or false
+local autoReawakeningProgressionUpgradeEnabled = config.AutoReawakeningProgressionUpgradeToggle or false
+local autoMonarchProgressionUpgradeEnabled = config.AutoMonarchProgressionUpgradeToggle or false
 
 
 -- Stats options (display names)
@@ -793,7 +803,7 @@ end
 local function startAutoAchievements()
     task.spawn(function()
         local achievements = {
-            Total_Energy = 20,
+            Total_Energy = 24,
             Total_Coins = 15,
             Friends_Bonus = 5,
             Time_Played = 8,
@@ -819,7 +829,10 @@ local function startAutoAchievements()
                 [5] = "V", [6] = "VI", [7] = "VII", [8] = "VIII",
                 [9] = "IX", [10] = "X", [11] = "XI", [12] = "XII",
                 [13] = "XIII", [14] = "XIV", [15] = "XV", [16] = "XVI",
-                [17] = "XVII", [18] = "XVIII", [19] = "XIX", [20] = "XX"
+                [17] = "XVII", [18] = "XVIII", [19] = "XIX", [20] = "XX",
+                [21] = "XXI", [22] = "XXII", [23] = "XXIII", [24] = "XXIV",
+                [25] = "XXV", [26] = "XXVI", [27] = "XXVII", [28] = "XXVIII",
+                [29] = "XXIX", [30] = "XXX"
             }
             return romanNumerals[num]
         end
@@ -1378,6 +1391,38 @@ function startAutoAttackRangeUpgrade()
     end)
 end
 
+-- Add missing function for auto chakra progression upgrade
+local function startAutoChakraProgressionUpgrade()
+    task.spawn(function()
+        -- Unlock Chakra Progression first (only once)
+        local unlockArgs = {
+            [1] = {
+                ["Upgrading_Name"] = "Unlock",
+                ["Action"] = "_Upgrades",
+                ["Upgrade_Name"] = "Chakra_Progression_Unlock",
+            }
+        }
+        pcall(function()
+            ToServer:FireServer(unpack(unlockArgs))
+        end)
+        task.wait(2)
+        -- Now keep upgrading while enabled
+        while autoChakraProgressionUpgradeEnabled and getgenv().SeisenHubRunning do
+            local upgradeArgs = {
+                [1] = {
+                    ["Upgrading_Name"] = "Chakra",
+                    ["Action"] = "_Upgrades",
+                    ["Upgrade_Name"] = "Chakra_Progression",
+                }
+            }
+            pcall(function()
+                ToServer:FireServer(unpack(upgradeArgs))
+            end)
+            task.wait(2)
+        end
+    end)
+end
+
 local function applyNotificationsState()
     local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui", 5)
     if not playerGui then return end
@@ -1565,6 +1610,8 @@ function startAutoCursedProgressionUpgrade()
         pcall(function()
             ToServer:FireServer(unpack(unlockArgs))
         end)
+        -- Wait to ensure unlock is processed
+        task.wait(2) -- Adjust delay if needed based on server response time
         -- Now keep upgrading while enabled
         while autoCursedProgressionUpgradeEnabled and getgenv().SeisenHubRunning do
             local upgradeArgs = {
@@ -1811,7 +1858,8 @@ local redeemCodes = {
     "Refresh", "175KFAV", "Update6", "5MVisits", "6MVisits", "190KFAV", "Update5Part2", "45KLIKES", "140KFAV",
     "160KFAV", "4MVisits", "SorryForShutdown3", "SomeBugFix1", "40KLikes", "Update5Part1", "30KLIKES", "125KFAV",
     "7KPlayers", "35KLIKES", "SorryForShutdown2", "SorryForSouls", "3MVISITS", "SorryForDelay2", "60KFav", "75KFav",
-    "2MVisits", "Update3Part2", "20KLikes", "SorryForDelay1", "6KPlayers", "Update4", "25KLIKES", "100KFAV"
+    "2MVisits", "Update3Part2", "20KLikes", "SorryForDelay1", "6KPlayers", "Update4", "25KLIKES", "100KFAV",
+    "Update10", "20MVisits", "280KFAV", "290KFAV", "105KLikes", "EnergyFix", "TinyCode"
 }
 
 local function redeemAllCodes()
@@ -1854,10 +1902,98 @@ function startAutoDeleteGacha()
     end)
 end
 
+local function startAutoReawakeningProgressionUpgrade()
+    task.spawn(function()
+        -- Unlock ReAwakening first
+        local unlockArgs = {
+            [1] = {
+                ["Upgrading_Name"] = "Unlock",
+                ["Action"] = "_Upgrades",
+                ["Upgrade_Name"] = "ReAwakening_Progression_Unlock",
+            }
+        }
+        pcall(function()
+            ToServer:FireServer(unpack(unlockArgs))
+        end)
+        task.wait(2)
+        -- Now keep upgrading while enabled
+        while autoReawakeningProgressionUpgradeEnabled and getgenv().SeisenHubRunning do
+            local upgradeArgs = {
+                [1] = {
+                    ["Upgrading_Name"] = "ReAwakening",
+                    ["Action"] = "_Upgrades",
+                    ["Upgrade_Name"] = "ReAwakening_Progression",
+                }
+            }
+            pcall(function()
+                ToServer:FireServer(unpack(upgradeArgs))
+            end)
+            task.wait(2)
+        end
+    end)
+end
 
+local function startAutoSoloHunterRank()
+    task.spawn(function()
+        -- Unlock Solo Hunter Rank first
+        local unlockArgs = {
+            [1] = {
+                ["Upgrading_Name"] = "Unlock",
+                ["Action"] = "_Upgrades",
+                ["Upgrade_Name"] = "Solo_Hunter_Rank_Unlock",
+            }
+        }
+        pcall(function()
+            ToServer:FireServer(unpack(unlockArgs))
+        end)
+        task.wait(2)
+        -- Now keep rolling while enabled
+        while autoSoloHunterRankEnabled and getgenv().SeisenHubRunning do
+            local rollArgs = {
+                [1] = {
+                    ["Open_Amount"] = 1,
+                    ["Action"] = "_Gacha_Activate",
+                    ["Name"] = "Solo_Hunter_Rank",
+                }
+            }
+            pcall(function()
+                ToServer:FireServer(unpack(rollArgs))
+            end)
+            task.wait(1)
+        end
+    end)
+end
 
-
-
+local function startAutoMonarchProgressionUpgrade()
+    task.spawn(function()
+        -- Unlock Monarch first
+        local unlockArgs = {
+            [1] = {
+                ["Upgrading_Name"] = "Unlock",
+                ["Action"] = "_Upgrades",
+                ["Upgrade_Name"] = "Monarch_Progression_Unlock",
+            }
+        }
+        pcall(function()
+            ToServer:FireServer(unpack(unlockArgs))
+        end)
+        task.wait(2)
+        -- Now keep upgrading while enabled
+        while autoMonarchProgressionUpgradeEnabled and getgenv().SeisenHubRunning do
+            local upgradeArgs = {
+                [1] = {
+                    ["Upgrading_Name"] = "Monarch",
+                    ["Action"] = "_Upgrades",
+                    ["Upgrade_Name"] = "Monarch_Progression",
+                }
+            }
+            pcall(function()
+                ToServer:FireServer(unpack(upgradeArgs))
+            end)
+            task.wait(2)
+        end
+    end)
+end
 if isAuraEnabled then startAutoFarm() end
 if fastKillAuraEnabled then startFastKillAura() end
 if slowKillAuraEnabled then startSlowKillAura() end
@@ -1892,6 +2028,12 @@ if autoObeliskEnabled then startAutoObelisk() end
 if autoRollDemonArtsEnabled then startAutoRollDemonArts() end
 if fpsBoostEnabled then applyFPSBoostState() end
 if config.AutoDeleteGachaUnitsToggle then startAutoDeleteGacha() end
+if config.AutoChakraProgressionUpgradeToggle then startAutoChakraProgressionUpgrade() end
+if autoChakraProgressionUpgradeEnabled then startAutoChakraProgressionUpgrade() end
+if autoSoloHunterRankEnabled then startAutoSoloHunterRank() end
+if autoReawakeningProgressionUpgradeEnabled then startAutoReawakeningProgressionUpgrade() end
+if autoMonarchProgressionUpgradeEnabled then startAutoMonarchProgressionUpgrade() end
+if autoSpiritualPressureUpgradeEnabled then startAutoSpiritualPressureUpgrade() end
 
 
 -- Auto Farm Toggle
@@ -1914,6 +2056,7 @@ LeftGroupbox:AddToggle("FastKillAuraToggle", {
     Callback = function(Value)
         disableAllAurasExcept("FastKillAura")
         fastKillAuraEnabled = Value
+
         config.FastKillAuraToggle = Value
         if Value then startFastKillAura() end
         saveConfig()
@@ -2168,6 +2311,17 @@ RollGroupbox2:AddToggle("AutoRollDemonArtsToggle", {
         autoRollDemonArtsEnabled = Value
         config.AutoRollDemonArtsToggle = Value
         if Value then startAutoRollDemonArts() end
+        saveConfig()
+    end
+})
+
+RollGroupbox2:AddToggle("AutoSoloHunterRankToggle", {
+    Text = "Auto Roll Solo Rank",
+    Default = autoSoloHunterRankEnabled,
+    Callback = function(Value)
+        autoSoloHunterRankEnabled = Value
+        config.AutoSoloHunterRankToggle = Value
+        if Value then startAutoSoloHunterRank() end
         saveConfig()
     end
 })
@@ -2450,7 +2604,6 @@ DungeonGroupbox:AddToggle("AutoEnterDungeonToggle", {
     end
 })
 
--- Upgrades
 local upgradeOptions = {
     "Star_Luck", "Damage", "Energy", "Coins", "Drops",
     "Avatar_Souls_Drop", "Movement_Speed", "Fast_Roll", "Star_Speed"
@@ -2525,6 +2678,39 @@ Upgrade2:AddToggle("AutoCursedProgressionUpgradeToggle", {
         autoCursedProgressionUpgradeEnabled = Value
         config.AutoCursedProgressionUpgradeToggle = Value
         if Value then startAutoCursedProgressionUpgrade() end
+        saveConfig()
+    end
+})
+
+Upgrade2:AddToggle("AutoReawakeningProgressionUpgradeToggle", {
+    Text = "Auto Reawakening Progression Upgrade",
+    Default = autoReawakeningProgressionUpgradeEnabled,
+    Callback = function(Value)
+        autoReawakeningProgressionUpgradeEnabled = Value
+        config.AutoReawakeningProgressionUpgradeToggle = Value
+        if Value then startAutoReawakeningProgressionUpgrade() end
+        saveConfig()
+    end
+})
+
+Upgrade2:AddToggle("AutoMonarchProgressionUpgradeToggle", {
+    Text = "Auto Monarch Progression Upgrade",
+    Default = autoMonarchProgressionUpgradeEnabled,
+    Callback = function(Value)
+        autoMonarchProgressionUpgradeEnabled = Value
+        config.AutoMonarchProgressionUpgradeToggle = Value
+        if Value then startAutoMonarchProgressionUpgrade() end
+        saveConfig()
+    end
+})
+
+Upgrade2:AddToggle("AutoChakraProgressionUpgradeToggle", {
+    Text = "Auto Chakra Progression Upgrade",
+    Default = autoChakraProgressionUpgradeEnabled,
+    Callback = function(Value)
+        autoChakraProgressionUpgradeEnabled = Value
+        config.AutoChakraProgressionUpgradeToggle = Value
+        if Value then startAutoChakraProgressionUpgrade() end
         saveConfig()
     end
 })
@@ -2607,6 +2793,10 @@ UnloadGroupbox:AddButton("Unload Seisen Hub", function()
     selectedStat = false
     autoRollZanpakutoEnabledfalse = false
     autoCursedProgressionUpgradeEnabled = false
+    autoChakraProgressionUpgradeEnabled = false
+    autoSoloHunterRankEnabled = false
+    autoReawakeningProgressionUpgradeEnabled = false
+    autoMonarchProgressionUpgradeEnabled = false
     autoRollCursesEnabled = false
     autoObeliskEnabled = false
     selectedObeliskType = false
