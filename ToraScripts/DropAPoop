@@ -1,0 +1,33 @@
+-- Load Tora UI library
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RwalDev/Cracks/refs/heads/main/ToraScripts/librarynew.lua"))()
+
+-- Create window
+local window = library:CreateWindow("Drop a Poop")
+
+-- Global toggle state
+_G.PoopEnabled = false
+
+-- Core looping function
+local function startPoopLoop()
+    task.spawn(function()
+        local RS = game:GetService("ReplicatedStorage")
+        while _G.PoopEnabled do
+            RS:WaitForChild("PoopChargeStart"):FireServer()
+            RS:WaitForChild("PoopEvent"):FireServer(1)
+            task.wait(1)
+        end
+    end)
+end
+
+-- Add toggle via Tora UI
+window:AddToggle({
+    flag = "fastPoop",
+    text = "Fast Poop",
+    state = false,
+    callback = function(state)
+        _G.PoopEnabled = state
+        if state then
+            startPoopLoop()
+        end
+    end
+})
