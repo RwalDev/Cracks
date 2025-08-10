@@ -1,7 +1,5 @@
-warn("Seisen Hub - Cracked By Rwal")
-
+warn("Seisen Hub - Cracked By Rwal :3")
 MoonSec_StringsHiddenAttr = true
-
 local fetchedData = {
     ["7546582051"] = "https://raw.githubusercontent.com/RwalDev/Cracks/refs/heads/main/Seisen-Hub/Script_DungeonHeroes.lua",
     ["7541395924"] = "https://raw.githubusercontent.com/RwalDev/Cracks/refs/heads/main/Seisen-Hub/Script_BuildanIsland.lua",
