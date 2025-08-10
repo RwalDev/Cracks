@@ -20,7 +20,6 @@ local Window = Library:CreateWindow({
     ToggleKeybind = Enum.KeyCode.LeftAlt,
     Center = true,
     AutoShow = true,
-    MobileButtonsSide = "Left"
 })
 
 -- Store ScreenGui for cleanup
@@ -2763,3 +2762,4 @@ task.defer(function()
         end
     end
 end)
+
