@@ -1903,7 +1903,7 @@ trackTask(task.spawn(function()
                 end
 
                 local function findBestInInventory(category, typeName, equippedItem)
-                    local magicKeywords = {"magic", "wand", "staff", "spell", "orb", "tome"}
+                    local magicKeywords = {"magic", "wand", "staff", "spell", "orb", "tome","torch","stave"}
                     local function isMagicWeapon(itemData)
                         if not itemData or not itemData.Category then return false end
                         if itemData.Category ~= "Weapon" then return false end
@@ -3387,3 +3387,4 @@ AutoEquipHighestWeaponToggle:SetValue(config.autoEquipHighestWeapon)
 AutoFarmHeightSlider:SetValue(config.autoFarmHeight or autoFarmHeight)
 AutoSellToggle:SetValue(config.autoSellEnabled)
 AutoSellRarityDropdown:SetValue(config.autoSellRarity or selectedRarity)
+
