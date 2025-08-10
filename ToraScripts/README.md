@@ -7,11 +7,11 @@ Simple Ui Library. With Clean And Sexy Ui
 Credit To Tora
 ### Setup The Library
 ```lua
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/library",true))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RwalDev/Cracks/refs/heads/main/ToraScripts/library.lua",true))()
 ```
 ### Or Use The New
 ```lua
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew",true))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RwalDev/Cracks/refs/heads/main/ToraScripts/librarynew.lua",true))()
 ```
 
 
