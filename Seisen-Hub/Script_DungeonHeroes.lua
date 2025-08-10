@@ -2133,15 +2133,28 @@ local normalDungeonDifficulty = "Normal"
 
 local AutoNextDungeonToggle = NormalDungeonBox:AddToggle("AutoNextDungeon", {
     Text = "Auto Next Dungeon Sequence",
-    Default = config.autoNextDungeon,
+    Default = config.autoNextDungeon or false,
     Tooltip = "Automatically cycles through a dungeon/difficulty list",
     Callback = function(Value)
-        autoNextDungeon = Value
         config.autoNextDungeon = Value
         saveConfig()
         Library:Notify({Title = "Auto Next Dungeon", Description = Value and "Enabled" or "Disabled", Time = 2})
+        autoNextDungeon = config.autoNextDungeon
     end
 })
+
+
+-- Auto Next Dungeon queue logic
+trackTask(task.spawn(function()
+    while true do
+        if autoNextDungeon then
+            -- Your queue logic for next dungeon goes here
+            print("[SeisenHub] Queuing for next dungeon...")
+            -- ...existing queue logic...
+        end
+        task.wait(1.5) -- Adjust interval as needed
+    end
+end), "AutoNextDungeonQueue")
 
 
 NormalDungeonBox:AddDropdown("NormalDungeonName", {
@@ -3261,7 +3274,7 @@ trackTask(task.spawn(function()
 
             -- Wait for boss in last room to be defeated (as before)
             local bossName = nil
-            for i = 1, 300 do -- 5 minutes
+            for i = 1, 600 do -- 5 minutes
                 bossName = getLastRoomBossName()
                 if bossName then
                     break
@@ -3271,7 +3284,7 @@ trackTask(task.spawn(function()
 
             if bossName then
                 local appeared = false
-                for i = 1, 300 do -- 5 minutes for boss to appear
+                for i = 1, 600 do -- 5 minutes for boss to appear
                     if bossInMobs(bossName) then
                         appeared = true
                         break
