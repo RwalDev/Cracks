@@ -1903,6 +1903,19 @@ trackTask(task.spawn(function()
                 end
 
                 local function findBestInInventory(category, typeName, equippedItem)
+                    local magicKeywords = {"magic", "wand", "staff", "spell", "orb", "tome"}
+                    local function isMagicWeapon(itemData)
+                        if not itemData or not itemData.Category then return false end
+                        if itemData.Category ~= "Weapon" then return false end
+                        local name = (itemData.DisplayName or itemData.Name or ""):lower()
+                        for _, keyword in ipairs(magicKeywords) do
+                            if name:find(keyword, 1, true) then
+                                return true
+                            end
+                        end
+                        return false
+                    end
+
                     local bestItem = nil
                     local bestPower = -math.huge
                     local bestInfo = "None"
@@ -1914,11 +1927,15 @@ trackTask(task.spawn(function()
                                 itemData = itemsModule:GetItemData(item.Name)
                             end)
                             if itemData and itemData.Category == category and (not typeName or itemData.Type == typeName) then
-                                local power, info = getItemPower(item, false)
-                                if power > bestPower then
-                                    bestPower = power
-                                    bestItem = item
-                                    bestInfo = info
+                                if category == "Weapon" and isMagicWeapon(itemData) then
+                                    -- Skip magic-related weapons
+                                else
+                                    local power, info = getItemPower(item, false)
+                                    if power > bestPower then
+                                        bestPower = power
+                                        bestItem = item
+                                        bestInfo = info
+                                    end
                                 end
                             end
                         end
@@ -3274,7 +3291,7 @@ trackTask(task.spawn(function()
 
             -- Wait for boss in last room to be defeated (as before)
             local bossName = nil
-            for i = 1, 600 do -- 5 minutes
+            for i = 1, 300 do -- 5 minutes
                 bossName = getLastRoomBossName()
                 if bossName then
                     break
@@ -3284,7 +3301,7 @@ trackTask(task.spawn(function()
 
             if bossName then
                 local appeared = false
-                for i = 1, 600 do -- 5 minutes for boss to appear
+                for i = 1, 300 do -- 5 minutes for boss to appear
                     if bossInMobs(bossName) then
                         appeared = true
                         break
